@@ -1,0 +1,27 @@
+# robots.txt — The Black Perch (https://www.theblackperch.co.ke)
+# Canonical host must match the verified Search Console property.
+
+User-agent: *
+Allow: /
+
+# Process / handler endpoints — no indexable content, and some mutate state.
+Disallow: /cart/
+Disallow: /order/
+Disallow: /payment/
+Disallow: /profile/update.php
+Disallow: /includes/
+Disallow: /config.php
+
+# Account / auth screens — reachable but not worth crawling.
+Disallow: /login.php
+Disallow: /signup.php
+Disallow: /otp-verify.php
+Disallow: /reset-password.php
+Disallow: /new-password.php
+Disallow: /checkout.php
+Disallow: /payment-details.php
+Disallow: /add-card.php
+Disallow: /change-address.php
+
+# Point crawlers at the sitemap.
+Sitemap: https://www.theblackperch.co.ke/sitemap.xml

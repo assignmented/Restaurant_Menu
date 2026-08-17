@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"from PIL import Image; im=Image.open\\('assets/img/black_perch.png'\\); print\\('size', im.size, 'mode', im.mode\\)\")",
+      "Bash(\"/c/xampp/php/php.exe\" -r \"echo password_hash\\('demo1234', PASSWORD_DEFAULT\\);\")",
+      "Bash(\"/c/xampp/php/php.exe\" -r \"echo password_hash\\('admin1234', PASSWORD_DEFAULT\\);\")",
+      "Bash(/c/xampp/php/php.exe -r ' *)",
+      "Bash(REQUEST_METHOD=GET QUERY_STRING=run=1 REQUEST_URI=\"/install.php?run=1\" \"/c/xampp/php/php.exe\" install.php)",
+      "Bash(REQUEST_METHOD=GET QUERY_STRING=\"run=1\" REQUEST_URI=\"/install.php?run=1\" \"/c/xampp/php/php.exe\" install.php)"
+    ]
+  }
+}

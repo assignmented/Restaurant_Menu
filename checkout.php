@@ -63,6 +63,8 @@ include __DIR__ . '/includes/header.php';
     .payment-option.is-disabled{opacity:.5;cursor:not-allowed;}
     .payment-option.is-disabled:hover{border-color:var(--bp-line);}
     .payment-option.is-disabled:has(input:checked){border-color:var(--bp-line);background:var(--bp-card);}
+    .po-extra{margin:0 0 .6rem .25rem;padding-left:3.5rem;}
+    .po-field-label{display:block;font-size:.72rem;color:var(--bp-muted);margin-bottom:.35rem;}
 </style>
 <div class="px-3">
     <?php if ($dining === 'takeaway' && $rider === 'send'): ?>
@@ -77,7 +79,7 @@ include __DIR__ . '/includes/header.php';
     <?php endif; ?>
 
     <!-- Payment method -->
-    <form action="#" method="post">
+    <form action="payment/mpesa_stkpush.php" method="post">
         <div class="glass-card p-3 mb-3">
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <h6 class="fw-bold mb-0">Payment method</h6>
@@ -85,7 +87,7 @@ include __DIR__ . '/includes/header.php';
             </div>
 
             <label class="payment-option">
-                <input type="radio" name="payment" value="mpesa">
+                <input type="radio" name="payment" value="mpesa" checked>
                 <span class="po-icon" style="color:#33b541;"><i class="fa-solid fa-mobile-screen-button"></i></span>
                 <span class="po-body">
                     <span class="po-title">M-Pesa</span>
@@ -93,13 +95,17 @@ include __DIR__ . '/includes/header.php';
                 </span>
                 <span class="po-brand" style="background:#33b541;">M-PESA</span>
             </label>
+            <div class="po-extra" id="mpesaPhoneWrap" hidden>
+                <label class="po-field-label" for="mpesaPhone">M-Pesa phone number</label>
+                <input type="tel" id="mpesaPhone" name="mpesa_phone" class="form-control-2" placeholder="07xx xxx xxx" inputmode="tel" autocomplete="tel">
+            </div>
 
-            <label class="payment-option is-disabled">
+            <label class="payment-option">
                 <input type="radio" name="payment" value="visa">
                 <span class="po-icon"><i class="fa-solid fa-credit-card"></i></span>
                 <span class="po-body">
                     <span class="po-title">Visa</span>
-                    <span class="po-sub">•••• 2187</span>
+                    <span class="po-sub">Coming soon</span>
                 </span>
                 <span class="po-brand" style="background:#1a1a72;">VISA</span>
             </label>
@@ -134,4 +140,17 @@ include __DIR__ . '/includes/header.php';
     </form>
 </div>
 <div class="pb-4"></div>
+<script>
+(function () {
+    var wrap = document.getElementById('mpesaPhoneWrap');
+    if (!wrap) return;
+    var radios = document.querySelectorAll('input[name="payment"]');
+    function sync() {
+        var sel = document.querySelector('input[name="payment"]:checked');
+        wrap.hidden = !(sel && sel.value === 'mpesa');
+    }
+    radios.forEach(function (r) { r.addEventListener('change', sync); });
+    sync();
+})();
+</script>
 <?php include __DIR__ . '/includes/footer.php'; ?>

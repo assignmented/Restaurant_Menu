@@ -1,17 +1,17 @@
 <?php
-/** Product detail. */
-require_once __DIR__ . '/config.php';
-$id = (int)($_GET['id'] ?? 0);
-$p = find_item($id) ?: find_product($id) ?: products()[0];
-$active = '';
-$pageTitle = $p['name'] . ' · Order on ' . BRAND_NAME;
-$metaDescription = 'Order ' . $p['name'] . ' for fast delivery in Meru, Kenya on The Black Perch. '
-    . ($p['by'] ?? '') . ' · KSh ' . number_format((float)($p['price'] ?? 0), 2)
-    . ' · ' . ($p['cat'] ?? '') . ' · pay with M-Pesa, track live.';
-$canonical = 'product.php?id=' . $id;
-$ogType = 'article';
-$metaImage = isset($p['img']) && $p['img'] !== '' ? $p['img'] : null;
-include __DIR__ . '/includes/header.php';
+    /** Product detail. */
+    require_once __DIR__ . '/config.php';
+    $id = (int)($_GET['id'] ?? 0);
+    $p = find_item($id) ?: find_product($id) ?: products()[0];
+    $active = '';
+    $pageTitle = $p['name'] . ' · Order on ' . BRAND_NAME;
+    $metaDescription = 'Order ' . $p['name'] . ' for fast delivery in Meru, Kenya on The Black Perch. '
+        . ($p['by'] ?? '') . ' · KSh ' . number_format((float)($p['price'] ?? 0), 2)
+        . ' · ' . ($p['cat'] ?? '') . ' · pay with M-Pesa, track live.';
+    $canonical = 'product.php?id=' . $id;
+    $ogType = 'article';
+    $metaImage = isset($p['img']) && $p['img'] !== '' ? $p['img'] : null;
+    include __DIR__ . '/includes/header.php';
 ?>
 <!-- Hero image -->
 <div class="product-hero">
@@ -64,7 +64,8 @@ include __DIR__ . '/includes/header.php';
         </div>
         <span class="text-muted-2" style="font-size:.85rem;">Quantity</span>
     </div>
-
+    
+    <!-- Add to cart form -->
     <form action="cart/add.php" method="post" style="padding-top:1rem !important;">
         <input type="hidden" name="id" value="<?= $p['id'] ?>">
         <input type="hidden" name="name" value="<?= htmlspecialchars($p['name']) ?>">

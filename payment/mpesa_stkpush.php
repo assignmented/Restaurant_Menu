@@ -1,4 +1,31 @@
   <?php
+
+    $phone_number = $_POST['mpesa_phone'] ?? '';
+
+    if ($phone_number !== '') {
+
+        function normalizePhoneNumber($phone) {
+            // Strip spaces, dashes, and any non-digit/plus characters
+            $phone = preg_replace('/[^\d+]/', '', $phone);
+
+            if (strpos($phone, '+254') === 0) {
+                // +254712345678 -> 254712345678
+                $phone = substr($phone, 1);
+            } elseif (strpos($phone, '0') === 0) {
+                // 0712345678 -> 254712345678
+                $phone = '254' . substr($phone, 1);
+            } elseif (strpos($phone, '254') === 0) {
+                // already 254712345678
+                // no change needed
+            } else {
+                // Unexpected format, return as-is (will likely fail Safaricom validation)
+            }
+
+            return $phone;
+        }
+
+        $phone_number = normalizePhoneNumber($phone_number);
+
         $env = parse_ini_file('../.env');
 
         $consumer_key = $env["SECURE_CK"];
@@ -64,7 +91,7 @@
         $stk_push_response = initiateSTKPush($access_token, $business_short_code, $passkey, $amount, $phone_number, $callback_url);
         
         
-        if ($stk_push_response->ResponseCode === "0") {
+        /*if ($stk_push_response->ResponseCode === "0") {
             // Payment request successful, save to database
             $checkout_request_id = $stk_push_response->CheckoutRequestID;
             $merchant_request_id = $stk_push_response->MerchantRequestID;
@@ -95,4 +122,5 @@
                             'message' => "Failed to initiate payment. Please try again",
                             'value' => '0'
                         ];
-        }
+        }*/
+    }

@@ -1,11 +1,12 @@
 <?php
     // callback.php
+    $env = parse_ini_file('../.env');
     
     // Database connection
-    $servername = "localhost";
-    $username = "tronsart_root";
-    $password = "AlphaT3x5qeo";
-    $dbname = "tronsart_gida";
+    $servername = $env["LOCAL_HOST"];
+    $username = $env["LOCAL_ROOT"];
+    $password = $env["LOCAL_PASS"];
+    $dbname = $env["LOCAL_DATA"];
     
     $conn = new mysqli($servername, $username, $password, $dbname);
     
@@ -27,7 +28,7 @@
     logMessage("Received callback: " . $mpesa_response);
     
     // Check if the callback content is valid
-    if (isset($callbackContent->Body->stkCallback->ResultCode)) {
+    /*if (isset($callbackContent->Body->stkCallback->ResultCode)) {
         $result_code = $callbackContent->Body->stkCallback->ResultCode;
         $checkout_request_id = $callbackContent->Body->stkCallback->CheckoutRequestID;
     
@@ -55,7 +56,7 @@
         }
     } else {
         logMessage("Invalid callback content received");
-    }
+    }*/
     
     $conn->close();
     

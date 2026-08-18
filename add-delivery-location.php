@@ -278,7 +278,7 @@ include __DIR__ . '/includes/header.php';
 </script>
 
 <style>
-    .delivery-map-wrap{position:relative;height:calc(100dvh - 70px);overflow:hidden;background:var(--bp-card);}
+    .delivery-map-wrap{position:relative;height:calc(100dvh - 160px);overflow:hidden;background:var(--bp-card);}
     #map{position:absolute;inset:0;width:100%;height:100%;background:var(--bp-card);}
     .picker-pin{position:absolute;top:50%;left:50%;transform:translate(-50%,-100%);z-index:4;pointer-events:none;
         filter:drop-shadow(0 6px 8px rgba(0,0,0,.45));animation:pinDrop .35s ease;}

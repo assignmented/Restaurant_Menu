@@ -8,5 +8,5 @@ if (isset($_GET['remove'])) {
     $qty = max(1, (int)($_GET['qty'] ?? 1));
     if (isset($_SESSION['cart'][$id])) $_SESSION['cart'][$id]['qty'] = $qty;
 }
-header('Location: ../my-order.php');
+header('Location: ../cart.php');
 exit;

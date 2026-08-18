@@ -14,5 +14,5 @@ if ($id !== '') {
         $_SESSION['cart'][$id] = compact('id','name','price','img','qty');
     }
 }
-header('Location: ../my-order.php');
+header('Location: ../cart.php');
 exit;

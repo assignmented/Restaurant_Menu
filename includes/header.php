@@ -30,6 +30,7 @@ $sidebar   = $sidebar ?? true;
     <link rel="icon" type="image/png" href="assets/img/black_perch.png">
     <link rel="apple-touch-icon" href="assets/img/black_perch.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/custom.css">
 </head>
 <body>
 <?php if ($chrome): ?>
@@ -39,12 +40,12 @@ $sidebar   = $sidebar ?? true;
         <nav class="links">
             <a href="home.php" class="<?= $active==='home'?'active':'' ?>">Home</a>
             <a href="offers.php" class="<?= $active==='offers'?'active':'' ?>">Offers</a>
-            <a href="my-order.php" class="<?= $active==='cart'?'active':'' ?>">My Order</a>
+            <a href="cart.php" class="<?= $active==='cart'?'active':'' ?>">Cart</a>
             <a href="profile.php" class="<?= $active==='profile'?'active':'' ?>">Profile</a>
             <a href="more.php" class="<?= $active==='more'?'active':'' ?>">More</a>
         </nav>
         <span class="spacer"></span>
-        <a href="my-order.php" class="btn-icon position-relative" aria-label="Cart">
+        <a href="cart.php" class="btn-icon position-relative" aria-label="Cart">
             <i class="fa-solid fa-bag-shopping"></i>
             <?php if (cart_count() > 0): ?>
                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary-2" style="font-size:.6rem"><?= cart_count() ?></span>
@@ -59,7 +60,7 @@ $sidebar   = $sidebar ?? true;
             <div class="mt-4 d-flex flex-column gap-1">
                 <a href="home.php" class="side-link <?= $active==='home'?'active':'' ?>"><i class="fa-solid fa-house"></i> Home</a>
                 <a href="offers.php" class="side-link <?= $active==='offers'?'active':'' ?>"><i class="fa-solid fa-tag"></i> Offers</a>
-                <a href="my-order.php" class="side-link <?= $active==='cart'?'active':'' ?>"><i class="fa-solid fa-bag-shopping"></i> My Order</a>
+                <a href="cart.php" class="side-link <?= $active==='cart'?'active':'' ?>"><i class="fa-solid fa-bag-shopping"></i> Cart</a>
                 <a href="profile.php" class="side-link <?= $active==='profile'?'active':'' ?>"><i class="fa-solid fa-user"></i> Profile</a>
                 <a href="more.php" class="side-link <?= $active==='more'?'active':'' ?>"><i class="fa-solid fa-table-cells"></i> More</a>
             </div>

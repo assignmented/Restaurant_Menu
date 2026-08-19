@@ -34,6 +34,8 @@
                     'mpesa_receipt' => $row['pay_mpesa_receipt'],
                     'amount' => $row['pay_amount']
                 ]);
+                $_SESSION['pay_mpesa_receipt'] = $row['pay_mpesa_receipt'];
+                $_SESSION['pay_amount'] = $row['pay_amount'];
             } elseif ($row['pay_status'] == 'FAILED') {
                 echo json_encode([
                     'success' => false,
@@ -61,5 +63,5 @@
     }
     
     $conn->close();
-    header('Location: ../order-confirmation.php');
+    header('Refresh:4; url=../order-confirmation.php');
     exit;

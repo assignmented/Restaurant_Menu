@@ -153,7 +153,7 @@
             <!-- Order summary -->
             <div class="glass-card p-3 mb-3">
                 <?php 
-                    var_dump($cart); exit;
+                    //var_dump($cart); exit;
                     foreach ($cart as $item): ?>
                     <div class="d-flex justify-content-between text-muted-2 mb-2">
                         <span><?= htmlspecialchars($item['name']) ?> x<?= (int)$item['qty'] ?></span>
@@ -169,7 +169,9 @@
             </div>
 
             <div id="statusMessage"></div>
-            <button type="submit" class="btn-primary-2 text-center">Send Order</button>
+            <?php if (cart_count() > 0): ?>        
+                <button type="submit" class="btn-primary-2 text-center">Send Order</button>
+            <?php endif; ?>
         </form>
 
         <div id="successCard" class="hidden mt-3"></div>
@@ -186,17 +188,17 @@
     </div>
 
     <script>
-    (function () {
-        var wrap = document.getElementById('mpesaPhoneWrap');
-        if (!wrap) return;
-        var radios = document.querySelectorAll('input[name="payment"]');
-        function sync() {
-            var sel = document.querySelector('input[name="payment"]:checked');
-            wrap.hidden = !(sel && sel.value === 'mpesa');
-        }
-        radios.forEach(function (r) { r.addEventListener('change', sync); });
-        sync();
-    })();
+        (function () {
+            var wrap = document.getElementById('mpesaPhoneWrap');
+            if (!wrap) return;
+            var radios = document.querySelectorAll('input[name="payment"]');
+            function sync() {
+                var sel = document.querySelector('input[name="payment"]:checked');
+                wrap.hidden = !(sel && sel.value === 'mpesa');
+            }
+            radios.forEach(function (r) { r.addEventListener('change', sync); });
+            sync();
+        })();
     </script>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

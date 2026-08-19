@@ -66,7 +66,10 @@ include __DIR__ . '/includes/header.php';
             <strong>Locating…</strong>
             <span>Drag the pin, search, or use your current location.</span>
         </div>
-        <button type="button" class="btn-primary-2" id="confirmBtn" disabled>Confirm &amp; Continue to Checkout</button>
+        
+        <?php if (cart_count() > 0): ?>        
+            <button type="button" class="btn-primary-2" id="confirmBtn" disabled>Confirm &amp; Continue to Checkout</button>
+        <?php endif; ?>
     </div>
 </div>
 

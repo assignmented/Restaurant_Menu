@@ -24,8 +24,16 @@ include __DIR__ . '/includes/header.php';
             <p class="text-primary-2 fw-bold mb-4">Order <?= htmlspecialchars($_SESSION['last_order']['id']) ?></p>
         <?php endif; ?>
 
-        <a href="order-tracking.php" class="btn-primary-2 text-center mb-3">Track My Order</a>
+        <a href="order-view.php" class="btn-primary-2 text-center mb-3">View My Order</a>
         <a href="home.php" class="d-block text-muted-2">Back To Home</a>
     </div>
 </div>
+
+<?php if (!empty($_SESSION['last_order'])): ?>
+    <script>
+        setTimeout(function () {
+            window.location.href = 'order-view.php';
+        }, 3500);
+    </script>
+<?php endif; ?>
 <?php include __DIR__ . '/includes/footer.php'; ?>

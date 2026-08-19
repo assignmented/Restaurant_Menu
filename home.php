@@ -28,7 +28,7 @@ include __DIR__ . '/includes/header.php';
             <i class="fa-solid fa-chevron-down" style="font-size:.7rem;"></i>
         </div>
     </div>
-    <a href="my-order.php" class="btn-icon position-relative" aria-label="Cart">
+    <a href="cart.php" class="btn-icon position-relative" aria-label="Cart">
         <i class="fa-solid fa-bag-shopping"></i>
         <?php if (cart_count() > 0): ?>
             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary-2" style="font-size:.6rem"><?= cart_count() ?></span>

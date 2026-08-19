@@ -104,8 +104,9 @@ include __DIR__ . '/includes/header.php';
         <div class="divider-line"></div>
         <div class="d-flex justify-content-between fw-bold"><span>Total</span><span class="text-primary-2" id="sumTotal">KSh. <?= number_format($total, 2) ?></span></div>
     </div>
-
-    <a href="<?= $checkoutHref ?>" class="btn-primary-2 text-center" id="checkoutLink">Checkout</a>
+    <?php if (cart_count() > 0): ?>        
+        <a href="<?= $checkoutHref ?>" class="btn-primary-2 text-center" id="checkoutLink">Checkout</a>
+    <?php endif; ?>
 </div>
 <div class="pb-4"></div>
 <?php include __DIR__ . '/includes/footer.php'; ?>

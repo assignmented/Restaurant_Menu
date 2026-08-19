@@ -40,7 +40,12 @@ $sidebar   = $sidebar ?? true;
         <nav class="links">
             <a href="home.php" class="<?= $active==='home'?'active':'' ?>">Home</a>
             <a href="offers.php" class="<?= $active==='offers'?'active':'' ?>">Offers</a>
-            <a href="cart.php" class="<?= $active==='cart'?'active':'' ?>">Cart</a>
+            <a href="cart.php" class="<?= $active==='cart'?'active':'' ?> position-relative" aria-label="Cart"">
+                Cart &nbsp;&nbsp;
+                <?php if (cart_count() > 0): ?>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary-2" style="font-size:.6rem"><?= cart_count() ?></span>
+                <?php endif; ?>
+            </a>
             <a href="profile.php" class="<?= $active==='profile'?'active':'' ?>">Profile</a>
             <a href="more.php" class="<?= $active==='more'?'active':'' ?>">More</a>
         </nav>

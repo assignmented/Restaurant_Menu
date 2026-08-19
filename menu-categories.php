@@ -6,6 +6,7 @@ require_once __DIR__ . '/config.php';
 $cats = categories();
 $active = 'menu';
 $pageTitle = 'Menu';
+$canonical = 'menu-categories.php';
 include __DIR__ . '/includes/header.php';
 ?>
 <div class="app-bar">

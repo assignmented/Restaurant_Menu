@@ -1,4 +1,4 @@
-art.php<?php
+<?php
 /** Menu Categories — slide-out category menu.
  *  Implemented as a Bootstrap offcanvas that opens on load, with the same
  *  content also rendered as a static fallback list. */

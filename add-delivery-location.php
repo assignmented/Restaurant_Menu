@@ -208,7 +208,22 @@ include __DIR__ . '/includes/header.php';
             } else {
                 setResult('Address not found — pin saved by coordinates.', latLng, source);
             }
+            saveLatLngToSession(latLng);
         });
+    }
+
+    function saveLatLngToSession(latLng) {
+        fetch('save_latlng.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                lat: latLng.lat(),   // if latLng is a google.maps.LatLng object
+                lng: latLng.lng()
+            })
+        })
+        .then(res => res.json())
+        .then(data => console.log('Session updated:', data))
+        .catch(err => console.error('Failed to save latLng:', err));
     }
 
     function setResult(address, latLng, source) {

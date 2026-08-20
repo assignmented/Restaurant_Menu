@@ -1,16 +1,13 @@
-
 <?php
-    // check_status.php
+    // mpesa_checkstatus.php
 
     header('Content-Type: application/json');
     
-    // Database connection
-     $servername = "localhost";
-    $username = "tronsart_root";
-    $password = "AlphaT3x5qeo";
-    $dbname = "tronsart_mpesastkpush";
+    // Database connection    
+    require_once __DIR__ . '/../config.php';
     
-    $conn = new mysqli($servername, $username, $password, $dbname);
+    // Database connection
+    $conn = new mysqli($local_host, $local_root, $local_pass, $local_data);
     
     if ($conn->connect_error) {
         die(json_encode(['success' => false, 'message' => "Connection failed: " . $conn->connect_error]));
@@ -63,5 +60,4 @@
     }
     
     $conn->close();
-    header('Refresh:4; url=../order-confirmation.php');
     exit;

@@ -64,6 +64,14 @@ function enforce_https(): void {
     }
 
     $env = parse_ini_file($envPath);
+    
+    // Daraja API configuration
+    $consumer_key = $env["SECURE_CK"];
+    $consumer_secret = $env["SECURE_CS"];
+    $business_short_code = '6205829'; //Store Number
+    $passkey = $env["SECURE_PK"];
+    $callback_url = 'https://theblackperch.co.ke/payment/mpesa_callback.php';
+
     $local_host = $env["LOCAL_HOST"];
     $local_root = $env["LOCAL_ROOT"];
     $local_pass = $env["LOCAL_PASS"];

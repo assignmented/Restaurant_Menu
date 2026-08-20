@@ -36,6 +36,11 @@
             $changeAddrHref = 'add-delivery-location.php?dining=takeaway&rider=send';
         }
 
+        if (isset($_SESSION['latlng'])) {
+            $lat = $_SESSION['latlng']['lat'];
+            $lng = $_SESSION['latlng']['lng'];
+        }
+
         $active = '';
         $pageTitle = 'View Order';
         $canonical = 'order-view.php';
@@ -101,7 +106,7 @@
         <div class="glass-card p-3 mb-3">
             <div class="d-flex justify-content-between align-items-center mb-1">
                 <h6 class="fw-bold mb-0">Delivery address</h6>
-                <a href="<?= $changeAddrHref ?>" style="font-size:.85rem;">View on Maps</a>
+                <a target="_blank" href="https://www.google.com/maps/dir/0.054297, 37.641386/<?= $lat ?>,<?= $lng ?>" style="font-size:.85rem;">View on Maps</a>
             </div>
             <p class="text-muted-2 mb-0"><?= htmlspecialchars($deliveryAddr) ?></p>
         </div>
@@ -127,12 +132,12 @@
 
         <div class="glass-card p-3 mb-3">
             <div class="d-flex justify-content-between text-muted-2 mb-2">
-                <span>Sub Total</span>
+                <span>M-PESA Receipt No.</span>
                 <span>KSh. <?= number_format($sub, 2) ?></span>
             </div>
             <div class="d-flex justify-content-between text-muted-2 mb-2">
-                <span>Dining</span>
-                <span><?= $dining === 'eat_in' ? 'Eat-in' : ('Take Away · ' . ($rider === 'own' ? 'I have a rider' : 'Send your rider')) ?></span>
+                <span>Amount Paid</span>
+                <span>KSh. <?= number_format($total, 2) ?></span>
             </div>
             <div class="d-flex justify-content-between text-muted-2 mb-2">
                 <span>Delivery Cost</span>

@@ -310,6 +310,12 @@
                 $('#successCard').html(successCard).removeClass('hidden');
                 $('#statusMessage').html('');
                 $('#paymentForm').hide();
+
+                
+                // Redirect to order confirmation page after 4 seconds
+                setTimeout(function() {
+                    window.location.href = '/order-confirmation.php';
+                }, 4000);
             }
         });
     </script>

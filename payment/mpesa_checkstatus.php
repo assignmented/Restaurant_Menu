@@ -6,18 +6,16 @@
     // Database connection    
     require_once __DIR__ . '/../config.php';
     
-    // Database connection
-    $conn = new mysqli($local_host, $local_root, $local_pass, $local_data);
     
-    if ($conn->connect_error) {
-        die(json_encode(['success' => false, 'message' => "Connection failed: " . $conn->connect_error]));
+    if ($conx->connect_error) {
+        die(json_encode(['success' => false, 'message' => "Connection failed: " . $conx->connect_error]));
     }
     
     if (isset($_GET['checkout_request_id'])) {
         $checkout_request_id = $_GET['checkout_request_id'];
         
         $sql = "SELECT pay_status, pay_mpesa_receipt, pay_amount FROM payments WHERE pay_checkout_req_id = ?";
-        $stmt = $conn->prepare($sql);
+        $stmt = $conx->prepare($sql);
         $stmt->bind_param("s", $checkout_request_id);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -59,5 +57,5 @@
         ]);
     }
     
-    $conn->close();
+    $conx->close();
     exit;

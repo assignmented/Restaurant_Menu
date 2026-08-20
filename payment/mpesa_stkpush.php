@@ -3,12 +3,9 @@
     // Database connection 
     require_once __DIR__ . '/../config.php';
     
-    // Database connection
-    $conn = new mysqli($local_host, $local_root, $local_pass, $local_data);
-
-    if ($conn->connect_error) {
-        log_payment_error('DB connection failed: ' . $conn->connect_error);
-        die("Connection failed: " . $conn->connect_error);
+    if ($conx->connect_error) {
+        log_payment_error('DB connection failed: ' . $conx->connect_error);
+        die("Connection failed: " . $conx->connect_error);
     }
 
 
@@ -39,6 +36,9 @@
     // Function to generate access token
     function getAccessToken($consumer_key, $consumer_secret) {
         $url = 'https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials';
+
+        session_write_close(); // Close the session to avoid blocking other requests while waiting for the cURL response
+        
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);
         $credentials = base64_encode($consumer_key . ':' . $consumer_secret);
@@ -46,6 +46,8 @@
         curl_setopt($curl, CURLOPT_HEADER, false);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($curl, CURLOPT_TIMEOUT, 15);
         $result = curl_exec($curl);
         $curl_error = curl_error($curl);
         $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
@@ -74,10 +76,14 @@
         $timestamp = date('YmdHis');
         $password = base64_encode($business_short_code . $passkey . $timestamp);
 
+        session_write_close(); // Close the session to avoid blocking other requests while waiting for the cURL response
+
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type:application/json', 'Authorization:Bearer ' . $access_token));
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($curl, CURLOPT_TIMEOUT, 15);
 
         $curl_post_data = array(
             'BusinessShortCode' => $business_short_code,
@@ -158,7 +164,7 @@
 
         if ($access_token === null) {
             echo json_encode(['success' => false, 'message' => 'Failed to initiate payment. Please try again.']);
-            $conn->close();
+            $conx->close();
             exit;
         }
 
@@ -169,7 +175,7 @@
             // Payment request successful, save to database
             $checkout_request_id = $stk_push_response->CheckoutRequestID;
             $sql = "INSERT INTO payments (pay_phone_number, pay_amount, pay_checkout_req_id, pay_status) VALUES (?, ?, ?, 'PENDING')";
-            $stmt = $conn->prepare($sql);
+            $stmt = $conx->prepare($sql);
             $stmt->bind_param("sds", $phone_number, $amount, $checkout_request_id);
 
             if ($stmt->execute()) {
@@ -193,5 +199,5 @@
         echo json_encode(['success' => false, 'message' => 'Invalid request method.']);
     }
 
-    $conn->close();
+    $conx->close();
 ?>

@@ -2,18 +2,15 @@
     // mpesa_callback.php
     require_once __DIR__ . '/../config.php';
     
-    // Database connection
-    $conn = new mysqli($local_host, $local_root, $local_pass, $local_data);
-
     function logMessage($message) {
         $logFile = __DIR__ . '/transaction_log.txt';
         $timestamp = date('Y-m-d H:i:s');
         file_put_contents($logFile, "[$timestamp] $message\n", FILE_APPEND | LOCK_EX);
     }
 
-    if ($conn->connect_error) {
-        logMessage("DB connection failed: " . $conn->connect_error);
-        die("Connection failed: " . $conn->connect_error);
+    if ($conx->connect_error) {
+        logMessage("DB connection failed: " . $conx->connect_error);
+        die("Connection failed: " . $conx->connect_error);
     }
 
     // Get the response from M-Pesa
@@ -50,10 +47,10 @@
 
         // Update the payment status in the database
         $sql = "UPDATE payments SET pay_status = ?, pay_mpesa_receipt = ? WHERE pay_checkout_req_id = ?";
-        $stmt = $conn->prepare($sql);
+        $stmt = $conx->prepare($sql);
 
         if ($stmt === false) {
-            logMessage("Failed to prepare UPDATE statement: " . $conn->error);
+            logMessage("Failed to prepare UPDATE statement: " . $conx->error);
         } else {
             $stmt->bind_param("sss", $status, $mpesa_receipt_number, $checkout_request_id);
 
@@ -73,7 +70,7 @@
         logMessage("Invalid callback content received: " . $mpesa_response);
     }
 
-    $conn->close();
+    $conx->close();
 
     // Respond to M-Pesa
     $response = array(

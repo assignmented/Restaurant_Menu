@@ -40,13 +40,13 @@ $checkoutHref = ($dining === 'takeaway' && $rider === 'send')
     ? 'add-delivery-location.php?dining=takeaway&rider=send'
     : 'checkout.php?dining=' . $dining . '&rider=' . $rider;
 $active = 'cart';
-$pageTitle = 'My Order';
-$canonical = 'my-order.php';
+$pageTitle = 'Cart';
+$canonical = 'cart.php';
 include __DIR__ . '/includes/header.php';
 ?>
 <div class="app-bar">
     <a href="home.php" class="btn-icon" aria-label="Back"><i class="fa-solid fa-arrow-left"></i></a>
-    <h1>My Order</h1>
+    <h1>Cart</h1>
     <span class="spacer"></span>
 </div>
 

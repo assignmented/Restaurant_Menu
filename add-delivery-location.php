@@ -1,6 +1,6 @@
 <?php
 /** Delivery location picker — drop a pin for "Send your rider" orders.
- *  Reached from my-order.php when dining=takeaway & rider=send. The picked
+ *  Reached from cart.php when dining=takeaway & rider=send. The picked
  *  address is stored in $_SESSION['delivery_address'] and the user continues
  *  to checkout. */
 require_once __DIR__ . '/config.php';
@@ -32,7 +32,7 @@ $canonical = 'add-delivery-location.php';
 include __DIR__ . '/includes/header.php';
 ?>
 <div class="app-bar">
-    <a href="my-order.php" class="btn-icon" aria-label="Back"><i class="fa-solid fa-arrow-left"></i></a>
+    <a href="cart.php" class="btn-icon" aria-label="Back"><i class="fa-solid fa-arrow-left"></i></a>
     <h1>Delivery Location</h1>
     <span class="spacer"></span>
 </div>

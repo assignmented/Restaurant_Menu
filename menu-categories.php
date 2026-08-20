@@ -1,4 +1,4 @@
-<?php
+art.php<?php
 /** Menu Categories — slide-out category menu.
  *  Implemented as a Bootstrap offcanvas that opens on load, with the same
  *  content also rendered as a static fallback list. */
@@ -13,7 +13,7 @@ include __DIR__ . '/includes/header.php';
     <a href="home.php" class="btn-icon" aria-label="Back"><i class="fa-solid fa-arrow-left"></i></a>
     <h1>Categories</h1>
     <span class="spacer"></span>
-    <a href="my-order.php" class="btn-icon position-relative" aria-label="Cart">
+    <a href="cart.php" class="btn-icon position-relative" aria-label="Cart">
         <i class="fa-solid fa-bag-shopping"></i>
         <?php if (cart_count() > 0): ?>
             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary-2" style="font-size:.6rem"><?= cart_count() ?></span>

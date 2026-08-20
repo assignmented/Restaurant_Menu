@@ -3,7 +3,7 @@
         require_once __DIR__ . '/config.php';
         $user = current_user();
         $cart = cart();
-        // Honor the dining + rider choices made on my-order.php (session, with a
+        // Honor the dining + rider choices made on cart.php (session, with a
         // query-string override from the Checkout link). Eat-in = no delivery fee;
         // take-away + "I have a rider" = no fee; take-away + "Send your rider" = fee.
         // No discount on either selection.

@@ -163,7 +163,7 @@
  * Mirrors the index.html order-toggle-wrap: <button>s swap the .active pill
  * instantly (no reload), reveal a contextual note + the rider block, and update
  * the delivery cost / total / checkout link live. The choice is persisted to the
- * session via a fire-and-forget GET (my-order.php sets $_SESSION from GET up top)
+ * session via a fire-and-forget GET (cart.php sets $_SESSION from GET up top)
  * so it survives the +/- quantity reloads. */
 (function () {
     'use strict';
@@ -231,7 +231,7 @@
     function persist() {
         var params = 'dining=' + encodeURIComponent(state.dining);
         if (state.dining === 'takeaway') params += '&rider=' + encodeURIComponent(state.rider);
-        fetch('my-order.php?' + params, { credentials: 'same-origin' }).catch(function () {});
+        fetch('cart.php?' + params, { credentials: 'same-origin' }).catch(function () {});
     }
 
     diningWrap.addEventListener('click', function (e) {

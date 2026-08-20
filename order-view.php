@@ -1,4 +1,4 @@
-    <?php
+<?php
         /** Checkout. */
         require_once __DIR__ . '/config.php';
         $user = current_user();
@@ -22,7 +22,7 @@
         if ($dining === 'eat_in') {
             $delivery = 0.00;
         } else {
-            $delivery = ($rider === 'own') ? 0.00 : 2.50;
+            $delivery = ($rider === 'own') ? 0.00 : 250;
         }
         $sub = cart_total();
         $total = $sub + $delivery;
@@ -40,6 +40,38 @@
             $lat = $_SESSION['latlng']['lat'];
             $lng = $_SESSION['latlng']['lng'];
         }
+
+        function e($v) { return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
+
+        $defaults = [
+            'receipt_no'     => 'TBP-' . date('YmdHis'),
+            'date'           => date('d/m/Y'),
+            'time'           => date('H:i'),
+            'cust_name'      => 'Walk-in Customer',
+            'served_by'      => 'Online Order',
+            'dining'         => 'takeaway',
+            'rider'          => 'send',
+            'delivery_fee'   => '250.00',
+            'payment_method' => 'M-Pesa',
+        ];
+
+        $data = $defaults;
+
+        $watermark_path = __DIR__ . '/watermarks/black_perch_b64.txt';
+        $watermark_b64 = is_file($watermark_path) ? trim(file_get_contents($watermark_path)) : '';
+        $watermark_data_uri = $watermark_b64 !== '' ? 'data:image/png;base64,' . $watermark_b64 : '';
+
+        
+        function money($n) {
+            return number_format((float) $n, 2);
+        }
+
+        // Set by payment/mpesa_checkstatus.php once Safaricom confirms the
+        // transaction. Empty if the order page is viewed before payment
+        // completes (receipt section below just won't have a receipt no.).
+        $mpesaReceipt = $_SESSION['pay_mpesa_receipt'] ?? '';
+        $amountPaid   = $_SESSION['pay_amount'] ?? $total;
+        $orderDate    = date('d M Y, H:i');
 
         $active = '';
         $pageTitle = 'View Order';
@@ -133,11 +165,11 @@
         <div class="glass-card p-3 mb-3">
             <div class="d-flex justify-content-between text-muted-2 mb-2">
                 <span>M-PESA Receipt No.</span>
-                <span>KSh. <?= number_format($sub, 2) ?></span>
+                <span><?= $mpesaReceipt !== '' ? htmlspecialchars($mpesaReceipt) : '—' ?></span>
             </div>
             <div class="d-flex justify-content-between text-muted-2 mb-2">
                 <span>Amount Paid</span>
-                <span>KSh. <?= number_format($total, 2) ?></span>
+                <span>KSh. <?= number_format($amountPaid, 2) ?></span>
             </div>
             <div class="d-flex justify-content-between text-muted-2 mb-2">
                 <span>Delivery Cost</span>
@@ -150,7 +182,100 @@
             <input type="hidden" name="amount" value="<?= number_format($total, 0) ?>">
         </div>
 
-        <div id="successCard" class="hidden mt-3"></div>
+        <button type="button" id="downloadReceiptBtn" class="btn-primary-2 text-center w-100 mb-3">
+            <i class="fa-solid fa-download me-1"></i> Download Receipt
+        </button>
     </div>
     <div class="pb-4"></div>
+
+    <!-- ===================================================================
+         Hidden receipt template. Kept out of the visible layout (positioned
+         off-canvas, not display:none, so html2canvas can still render it)
+         and only ever touched by the download script below. -->
+    <div id="receiptTemplate" style="position:absolute; left:-9999px; top:0; width:340px;">
+        <div style="background-image: url('assets/img/black_perch.png'); background-size: contain; background-repeat: no-repeat; color:#111; font-family:'Courier New',Courier,monospace; font-size:12px; line-height:1.5; padding:20px 18px;">
+            <div style="text-align:center; font-weight:700; font-size:14px; letter-spacing:.04em;">THE BLACK PERCH</div>
+            <div style="text-align:center; color:#555; font-size:11px; margin-bottom:8px;">Order Receipt</div>
+            <div style="border-top:1px dashed #999; margin:8px 0;"></div>
+
+            <div>Date: <?= htmlspecialchars($orderDate) ?></div>
+            <div>Dining: <?= $dining === 'eat_in' ? 'Eat-in' : ('Take Away · ' . ($rider === 'own' ? 'I have a rider' : 'Send your rider')) ?></div>
+            <?php if ($dining === 'takeaway' && $rider === 'send'): ?>
+                <div>Delivery to: <?= htmlspecialchars($deliveryAddr) ?></div>
+            <?php endif; ?>
+
+            <div style="border-top:1px dashed #999; margin:8px 0;"></div>
+
+            <?php foreach ($cart as $item): ?>
+                <div style="display:flex; justify-content:space-between;">
+                    <span><?= htmlspecialchars($item['name']) ?> x<?= (int)$item['qty'] ?></span>
+                    <span>KSh <?= number_format($item['price'] * $item['qty'], 2) ?></span>
+                </div>
+            <?php endforeach; ?>
+
+            <div style="border-top:1px dashed #999; margin:8px 0;"></div>
+
+            <div style="display:flex; justify-content:space-between;"><span>Sub Total</span><span>KSh <?= number_format($sub, 2) ?></span></div>
+            <div style="display:flex; justify-content:space-between;"><span>Delivery Cost</span><span>KSh <?= number_format($delivery, 2) ?></span></div>
+            <div style="display:flex; justify-content:space-between; font-weight:700;"><span>Total</span><span>KSh <?= number_format($total, 2) ?></span></div>
+
+            <div style="border-top:1px dashed #999; margin:8px 0;"></div>
+
+            <div style="display:flex; justify-content:space-between;"><span>Payment Method</span><span>M-Pesa</span></div>
+            <div style="display:flex; justify-content:space-between;"><span>M-Pesa Receipt</span><span><?= $mpesaReceipt !== '' ? htmlspecialchars($mpesaReceipt) : 'PENDING' ?></span></div>
+            <div style="display:flex; justify-content:space-between;"><span>Amount Paid</span><span>KSh <?= number_format($amountPaid, 2) ?></span></div>
+
+            <div style="border-top:1px dashed #999; margin:8px 0;"></div>
+            <div style="text-align:center; color:#777; font-size:10.5px;">Thank you for ordering with The Black Perch</div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script>
+    (function () {
+        var btn = document.getElementById('downloadReceiptBtn');
+        var template = document.getElementById('receiptTemplate');
+        if (!btn || !template) return;
+
+        btn.addEventListener('click', function () {
+            var originalLabel = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = 'Preparing receipt…';
+
+            html2canvas(template, { scale: 2, backgroundColor: '#ffffff' }).then(function (canvas) {
+                var imgData = canvas.toDataURL('image/png');
+                var jsPDFCtor = window.jspdf && window.jspdf.jsPDF;
+
+                if (!jsPDFCtor) {
+                    // Fallback: download the receipt as a PNG if the PDF
+                    // library failed to load, so the button still works.
+                    var link = document.createElement('a');
+                    link.href = imgData;
+                    link.download = 'black-perch-receipt.png';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    return;
+                }
+
+                var pdfWidth = canvas.width / 2; // scale:2 above
+                var pdfHeight = canvas.height / 2;
+                var pdf = new jsPDFCtor({
+                    orientation: 'portrait',
+                    unit: 'pt',
+                    format: [pdfWidth, pdfHeight]
+                });
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                pdf.save('black-perch-receipt.pdf');
+            }).catch(function (err) {
+                console.error('Receipt generation failed:', err);
+                alert('Could not generate the receipt. Please try again.');
+            }).finally(function () {
+                btn.disabled = false;
+                btn.innerHTML = originalLabel;
+            });
+        });
+    })();
+    </script>
 <?php include __DIR__ . '/includes/footer.php'; ?>

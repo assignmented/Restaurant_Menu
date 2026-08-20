@@ -1,4 +1,4 @@
-    <?php
+<?php
         /** Checkout. */
         require_once __DIR__ . '/config.php';
         $user = current_user();
@@ -22,7 +22,7 @@
         if ($dining === 'eat_in') {
             $delivery = 0.00;
         } else {
-            $delivery = ($rider === 'own') ? 0.00 : 2.50;
+            $delivery = ($rider === 'own') ? 0.00 : 250.00;
         }
         $sub = cart_total();
         $total = $sub + $delivery;

@@ -16,23 +16,14 @@ include __DIR__ . '/includes/header.php';
     <div class="flex-grow-1">
         <h2 class="fw-bold mb-0" style="font-size:1.4rem;">
             Good <?= $greeting ?>, 
-            <?//= //htmlspecialchars(ucfirst($user['user_name'])) ?></h2>
-        <div class="text-muted-2 d-flex align-items-center gap-1" style="font-size:.85rem;">
-            <i class="fa-solid fa-location-dot text-primary-2"></i> 
-            Delivering to
-            <select class="bg-transparent border-0 text-white fw-semibold" style="font-size:.85rem;">
-                <option>Current Location</option>
-                <option>14 Harborline Wharf</option>
-                <option>Office</option>
-            </select>
-            <i class="fa-solid fa-chevron-down" style="font-size:.7rem;"></i>
-        </div>
+            <?//= //htmlspecialchars(ucfirst($user['user_name'])) ?>
+        </h2>
     </div>
     <a href="cart.php" class="btn-icon position-relative" aria-label="Cart">
         <i class="fa-solid fa-bag-shopping"></i>
-        <?php if (cart_count() > 0): ?>
+        <?php //if (cart_count() > 0): ?>
             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary-2" style="font-size:.6rem"><?= cart_count() ?></span>
-        <?php endif; ?>
+        <?php //endif; ?>
     </a>
 </div>
 
@@ -40,7 +31,7 @@ include __DIR__ . '/includes/header.php';
 <div class="px-3 mt-3">
     <div class="search-input">
         <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" class="js-live-search" placeholder="Search food" autocomplete="off">
+        <input type="text" class="js-live-search" placeholder="Search food" autocomplete="off"/>
         <div class="search-results" aria-live="polite"></div>
     </div>
 </div>

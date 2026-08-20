@@ -11,7 +11,7 @@ include __DIR__ . '/includes/header.php';
         <!-- Orange hero panel -->
         <div class="welcome-hero">
             <div style="position:relative; z-index:1;">
-                <img src="assets/img/black_perch.png" alt="<?= BRAND_NAME ?>" class="bp-logo-img bp-logo-img-lg" style="margin:0 auto;">
+                <img src="assets/img/logo_black.png" alt="<?= BRAND_NAME ?>" class="bp-logo-img bp-logo-img-lg" style="margin:0 auto;">
             </div>
         </div>
 

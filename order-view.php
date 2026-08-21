@@ -62,9 +62,9 @@
         $watermark_data_uri = $watermark_b64 !== '' ? 'data:image/png;base64,' . $watermark_b64 : '';
 
         
-        function money($n) {
-            return number_format((float) $n, 2);
-        }
+    function money($n) {
+        return number_format((float) $n, 2);
+    }
 
         // Set by payment/mpesa_checkstatus.php once Safaricom confirms the
         // transaction. Empty if the order page is viewed before payment

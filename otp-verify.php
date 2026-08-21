@@ -4,6 +4,7 @@ require_once __DIR__ . '/config.php';
 $chrome = false;
 $pageTitle = 'Verify OTP';
 $pending = $_SESSION['pending_mobile'] ?? '07*********';
+    $canonical = 'otp-verify.php';
 include __DIR__ . '/includes/header.php';
 ?>
 <div class="phone-stage">

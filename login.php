@@ -3,6 +3,7 @@
 require_once __DIR__ . '/config.php';
 $chrome = false;
 $pageTitle = 'Login';
+    $canonical = 'login.php';
 include __DIR__ . '/includes/header.php';
 ?>
 <div class="phone-stage" style="background-image: url('assets/img/startup.png')">

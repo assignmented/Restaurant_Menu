@@ -3,6 +3,7 @@
 require_once __DIR__ . '/config.php';
 $active = '';
 $pageTitle = 'Payment Details';
+    $canonical = 'payment-details.php';
 include __DIR__ . '/includes/header.php';
 ?>
 <div class="app-bar">

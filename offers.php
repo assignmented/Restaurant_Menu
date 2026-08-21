@@ -4,6 +4,7 @@ require_once __DIR__ . '/config.php';
 $rests = restaurants();
 $active = 'offers';
 $pageTitle = 'Latest Offers';
+    $canonical = 'offers.php';
 include __DIR__ . '/includes/header.php';
 ?>
 <div class="app-bar">

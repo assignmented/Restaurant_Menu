@@ -3,6 +3,7 @@
 require_once __DIR__ . '/config.php';
 $chrome = false;
 $pageTitle = 'New Password';
+    $canonical = 'new-password.php';
 include __DIR__ . '/includes/header.php';
 ?>
 <div class="phone-stage">

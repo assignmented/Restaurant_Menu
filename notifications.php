@@ -9,6 +9,7 @@ $notifs = [
 ];
 $active = '';
 $pageTitle = 'Notifications';
+    $canonical = 'notifications.php';
 include __DIR__ . '/includes/header.php';
 ?>
 <div class="app-bar">

@@ -3,7 +3,7 @@
 require_once __DIR__ . '/config.php';
 $chrome = false;
 $pageTitle = 'Thank You';
-$canonical = 'onboard-live-tracking.php';
+$canonical = 'order-confirmation.php';
 include __DIR__ . '/includes/header.php';
 ?>
 <div class="phone-stage">

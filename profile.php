@@ -4,6 +4,7 @@ require_once __DIR__ . '/config.php';
 $user = current_user();
 $active = 'profile';
 $pageTitle = 'Profile';
+    $canonical = 'profile.php';
 include __DIR__ . '/includes/header.php';
 ?>
 <div class="app-bar">

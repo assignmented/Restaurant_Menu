@@ -8,6 +8,7 @@ $saved = [
 ];
 $active = '';
 $pageTitle = 'Change Address';
+    $canonical = 'change-address.php';
 include __DIR__ . '/includes/header.php';
 ?>
 <div class="app-bar">

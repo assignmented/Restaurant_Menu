@@ -9,6 +9,7 @@ $messages = [
 ];
 $active = '';
 $pageTitle = 'Inbox';
+    $canonical = 'inbox.php';
 include __DIR__ . '/includes/header.php';
 ?>
 <div class="app-bar">

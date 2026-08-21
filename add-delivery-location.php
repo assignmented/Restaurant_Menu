@@ -2,15 +2,21 @@
 /** Delivery location picker — drop a pin for "Send your rider" orders.
  *  Reached from cart.php when dining=takeaway & rider=send. The picked
  *  address is stored in $_SESSION['delivery_address'] and the user continues
- *  to checkout. */
+ *  to checkout. Road distance (from DELIVERY_ORIGIN) is calculated once,
+ *  client-side, when the user taps Confirm — not live while panning. */
 require_once __DIR__ . '/config.php';
 
-// AJAX: store the picked delivery address in session (called by confirmLocation()).
+// AJAX: store the picked delivery address (+ road distance) in session.
+// Called by confirmLocation() after the DistanceMatrixService lookup resolves.
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['address'])) {
     $_SESSION['delivery_address'] = [
-        'address' => trim((string) $_POST['address']),
-        'lat'     => isset($_POST['lat']) ? (float) $_POST['lat'] : null,
-        'lng'     => isset($_POST['lng']) ? (float) $_POST['lng'] : null,
+        'address'         => trim((string) $_POST['address']),
+        'lat'             => isset($_POST['lat']) ? (float) $_POST['lat'] : null,
+        'lng'             => isset($_POST['lng']) ? (float) $_POST['lng'] : null,
+        'distance_meters' => isset($_POST['distance_meters']) && $_POST['distance_meters'] !== ''
+                                ? (int) $_POST['distance_meters'] : null,
+        'distance_text'   => isset($_POST['distance_text']) && $_POST['distance_text'] !== ''
+                                ? trim((string) $_POST['distance_text']) : null,
     ];
     header('Content-Type: application/json');
     echo json_encode(['ok' => true]);
@@ -66,8 +72,8 @@ include __DIR__ . '/includes/header.php';
             <strong>Locating…</strong>
             <span>Drag the pin, search, or use your current location.</span>
         </div>
-        
-        <?php if (cart_count() > 0): ?>        
+
+        <?php if (cart_count() > 0): ?>
             <button type="button" class="btn-primary-2" id="confirmBtn" disabled>Confirm &amp; Continue to Checkout</button>
         <?php endif; ?>
     </div>
@@ -77,8 +83,10 @@ include __DIR__ . '/includes/header.php';
     const CHECKOUT_URL = 'checkout.php?dining=<?= htmlspecialchars($dining) ?>&rider=<?= htmlspecialchars($rider) ?>';
     // Fallback centre if geolocation is unavailable — Meru, Kenya.
     const DEFAULT_CENTER = { lat: 0.0470, lng: 37.6559 };
+    // Fixed origin point for road-distance calculation (restaurant/kitchen location).
+    const DELIVERY_ORIGIN = { lat: 0.054297, lng: 37.641386 };
 
-    let map, geocoder, autocomplete;
+    let map, geocoder, autocomplete, distanceService;
     let picked = null; // { address, lat, lng }
     let nextSource = 'pin'; // source badge for the next idle reverse-geocode
 
@@ -153,6 +161,7 @@ include __DIR__ . '/includes/header.php';
     window.initMap = function () {
       try {
         geocoder = new google.maps.Geocoder();
+        distanceService = new google.maps.DistanceMatrixService();
 
         map = new google.maps.Map(document.getElementById('map'), {
             center: DEFAULT_CENTER,
@@ -166,6 +175,8 @@ include __DIR__ . '/includes/header.php';
         // The picker is a fixed, floating pin at the map's centre (an overlay,
         // not a map marker) — you drag the map under it. Reverse-geocode the
         // centre whenever the map settles, so the card updates as you pan.
+        // (Road distance is NOT calculated here — only on Confirm — to avoid
+        // firing a Distance Matrix request on every pan.)
         map.addListener('idle', () => {
             reverseGeocode(map.getCenter(), nextSource);
             nextSource = 'pin';
@@ -208,22 +219,7 @@ include __DIR__ . '/includes/header.php';
             } else {
                 setResult('Address not found — pin saved by coordinates.', latLng, source);
             }
-            saveLatLngToSession(latLng);
         });
-    }
-
-    function saveLatLngToSession(latLng) {
-        fetch('save_latlng.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                lat: latLng.lat(),   // if latLng is a google.maps.LatLng object
-                lng: latLng.lng()
-            })
-        })
-        .then(res => res.json())
-        .then(data => console.log('Session updated:', data))
-        .catch(err => console.error('Failed to save latLng:', err));
     }
 
     function setResult(address, latLng, source) {
@@ -255,12 +251,44 @@ include __DIR__ . '/includes/header.php';
         );
     }
 
+    // Fired on Confirm tap: look up road distance from DELIVERY_ORIGIN to the
+    // picked pin (once, not live), then save everything to session.
     function confirmLocation() {
         if (!picked) return;
         const btn = document.getElementById('confirmBtn');
         btn.disabled = true;
+        btn.textContent = 'Calculating distance…';
+
+        distanceService.getDistanceMatrix({
+            origins: [DELIVERY_ORIGIN],
+            destinations: [{ lat: picked.lat, lng: picked.lng }],
+            travelMode: google.maps.TravelMode.DRIVING,
+            unitSystem: google.maps.UnitSystem.METRIC,
+        }, (response, status) => {
+            let distanceMeters = '', distanceText = '';
+            if (status === 'OK') {
+                const el = response.rows && response.rows[0] && response.rows[0].elements && response.rows[0].elements[0];
+                if (el && el.status === 'OK') {
+                    distanceMeters = el.distance.value;
+                    distanceText = el.distance.text;
+                }
+            }
+            // Don't block checkout if the distance lookup fails — just save
+            // without it (distance_meters/distance_text land empty).
+            saveLocation(distanceMeters, distanceText);
+        });
+    }
+
+    function saveLocation(distanceMeters, distanceText) {
+        const btn = document.getElementById('confirmBtn');
         btn.textContent = 'Saving…';
-        const body = new URLSearchParams({ address: picked.address, lat: picked.lat, lng: picked.lng });
+        const body = new URLSearchParams({
+            address: picked.address,
+            lat: picked.lat,
+            lng: picked.lng,
+            distance_meters: distanceMeters,
+            distance_text: distanceText,
+        });
         fetch('add-delivery-location.php', { method: 'POST', body: body, credentials: 'same-origin' })
             .then((r) => r.json())
             .then(() => { window.location.href = CHECKOUT_URL; })

@@ -28,12 +28,17 @@
         $total = $sub + $delivery;
 
         // Delivery address to show: the map-picked address for "Send your rider"
-        // orders, otherwise the user's saved address.
+        // orders, otherwise the user's saved address. Road distance (if it was
+        // calculated when the pin was confirmed) is shown alongside it.
         $deliveryAddr = $user['user_address'] ?? '';
         $changeAddrHref = 'change-address.php';
+        $distanceText = null;
+        $distanceMeters = null;
         if ($dining === 'takeaway' && $rider === 'send' && !empty($_SESSION['delivery_address']['address'])) {
             $deliveryAddr = $_SESSION['delivery_address']['address'];
             $changeAddrHref = 'add-delivery-location.php?dining=takeaway&rider=send';
+            $distanceText = $_SESSION['delivery_address']['distance_text'] ?? null;
+            $distanceMeters = $_SESSION['delivery_address']['distance_meters'] ?? null;
         }
 
         $active = 'cart';
@@ -66,6 +71,15 @@
         .payment-option.is-disabled:has(input:checked){border-color:var(--bp-line);background:var(--bp-card);}
         .po-extra{margin:0 0 .6rem .25rem;padding-left:3.5rem;}
         .po-field-label{display:block;font-size:.72rem;color:var(--bp-muted);margin-bottom:.35rem;}
+
+        /* --- Delivery distance badge --- */
+        .delivery-distance-badge{
+            display:inline-flex;align-items:center;gap:.35rem;margin-top:.5rem;
+            font-size:.75rem;font-weight:600;color:var(--bp-primary);
+            background:rgba(255,209,104,.08);border:1px solid rgba(255,209,104,.25);
+            padding:.25rem .6rem;border-radius:999px;
+        }
+        .delivery-distance-badge i{font-size:.7rem;}
 
         /* --- Floating loading modal --- */
         .modal-overlay{
@@ -104,6 +118,15 @@
                 <a href="<?= $changeAddrHref ?>" style="font-size:.85rem;">Change</a>
             </div>
             <p class="text-muted-2 mb-0"><?= htmlspecialchars($deliveryAddr) ?></p>
+            <?php if (!empty($distanceText)): ?>
+                <div class="delivery-distance-badge">
+                    <i class="fa-solid fa-route"></i> <?= htmlspecialchars($distanceText) ?> by road
+                </div>
+            <?php elseif ($distanceMeters !== null): ?>
+                <div class="delivery-distance-badge">
+                    <i class="fa-solid fa-route"></i> <?= number_format($distanceMeters / 1000, 1) ?> km by road
+                </div>
+            <?php endif; ?>
         </div>
         <?php endif; ?>
 

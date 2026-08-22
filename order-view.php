@@ -224,8 +224,8 @@
                 <img class="logo-img" src="<?= e($watermark_data_uri) ?>" alt="The Black Perch">
             <?php endif; ?>
             <div class="center bold">THE BLACK PERCH</div>
-            <div class="center">Website: https://www.theblackperch.com</div>
-            <div class="center">Mobile: 0117619325</div>
+            <div class="center">https://www.theblackperch.com</div>
+            <div class="center">+254117619325</div>
             <div class="center">Customer Order Receipt</div>
 
             <div class="dashed"></div>

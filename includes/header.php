@@ -38,16 +38,24 @@ $sidebar   = $sidebar ?? true;
     <div class="bp-topnav">
         <?php $size='sm'; include __DIR__ . '/logo.php'; ?>
         <nav class="links">
-            <a href="home.php" class="<?= $active==='home'?'active':'' ?>">Home</a>
-            <a href="offers.php" class="<?= $active==='offers'?'active':'' ?>">Offers</a>
-            <a href="cart.php" class="<?= $active==='cart'?'active':'' ?> position-relative" aria-label="Cart"">
-                Cart &nbsp;&nbsp;
+            <a href="home.php" class="<?= $active==='home'?'active':'' ?>">
+                <i class="fa-solid fa-house"></i> &nbsp; Home
+            </a>
+            <a href="offers.php" class="<?= $active==='offers'?'active':'' ?>">
+                <i class="fa-solid fa-tag"></i> &nbsp; Offers
+            </a>
+            <a href="cart.php" class="<?= $active==='cart'?'active':'' ?> position-relative" aria-label="Cart">
+                <i class="fa-solid fa-bag-shopping"></i> &nbsp; Cart &nbsp;&nbsp;
                 <?php if (cart_count() > 0): ?>
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary-2" style="font-size:.6rem"><?= cart_count() ?></span>
                 <?php endif; ?>
             </a>
-            <a href="profile.php" class="<?= $active==='profile'?'active':'' ?>">Profile</a>
-            <a href="more.php" class="<?= $active==='more'?'active':'' ?>">More</a>
+            <a href="profile.php" class="<?= $active==='profile'?'active':'' ?>">
+                <i class="fa-solid fa-user"></i> &nbsp; Profile
+            </a>
+            <a href="more.php" class="<?= $active==='more'?'active':'' ?>">
+                <i class="fa-solid fa-table-cells"></i> &nbsp; More
+            </a>
         </nav>
         <span class="spacer"></span>
         <a href="cart.php" class="btn-icon position-relative" aria-label="Cart">

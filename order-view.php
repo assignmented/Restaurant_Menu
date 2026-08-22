@@ -270,7 +270,7 @@
             <div class="dashed"></div>
             <div class="center" style="color:#666;">Thank you for ordering with The Black Perch</div>
         </div>
-        <button type="button" id="downloadReceiptBtn" class="actions btn-primary-2 text-center w-100 mb-3">
+        <button type="button" id="downloadReceiptBtn" style="margin-top: 14px;" class="btn-primary-2 text-center w-100 mb-3">
             <i class="fa-solid fa-download me-1"></i> Download Receipt
         </button>
       </div>

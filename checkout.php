@@ -34,11 +34,13 @@
         $changeAddrHref = 'change-address.php';
         $distanceText = null;
         $distanceMeters = null;
+        $deliveryCost = null;
         if ($dining === 'takeaway' && $rider === 'send' && !empty($_SESSION['delivery_address']['address'])) {
             $deliveryAddr = $_SESSION['delivery_address']['address'];
             $changeAddrHref = 'add-delivery-location.php?dining=takeaway&rider=send';
             $distanceText = $_SESSION['delivery_address']['distance_text'] ?? null;
             $distanceMeters = $_SESSION['delivery_address']['distance_meters'] ?? null;
+            $deliveryCost = $_SESSION['delivery_address']['delivery_cost'] ?? null;
         }
 
         $active = 'cart';
@@ -149,7 +151,7 @@
                 </label>
                 <div class="po-extra" id="mpesaPhoneWrap" hidden>
                     <label class="po-field-label" for="mpesaPhone">M-Pesa phone number</label>
-                    <input type="tel" id="mpesaPhone" name="mpesa_phone" class="form-control-2" placeholder="07xx xxx xxx" inputmode="tel" autocomplete="tel">
+                    <input required type="tel" id="mpesaPhone" name="mpesa_phone" class="form-control-2" placeholder="07xx xxx xxx" inputmode="tel" autocomplete="tel">
                 </div>
 
                 <label class="payment-option">
@@ -179,6 +181,7 @@
                     //var_dump($cart); exit;
                     foreach ($cart as $item): ?>
                     <div class="d-flex justify-content-between text-muted-2 mb-2">
+                        <!--<span><?= htmlspecialchars($item['id']) ?></span>-->
                         <span><?= htmlspecialchars($item['name']) ?> x<?= (int)$item['qty'] ?></span>
                         <span>KSh. <?= number_format($item['price']*$item['qty'], 2) ?></span>
                     </div>

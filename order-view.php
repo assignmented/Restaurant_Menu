@@ -51,8 +51,12 @@
         return $out;
     }
 
+    $dateObj = DateTime::createFromFormat('U.u', microtime(TRUE));
+    $dateObj->setTimeZone(new DateTimeZone('Africa/Nairobi'));
+    $date = $dateObj->format('YmdHisu');
+
     $defaults = [
-        'receipt_no'     => 'TBP-' . date('YmdHis'),
+        'receipt_no'     => 'TBP-' . $date,
         'date'           => date('d/m/Y'),
         'time'           => date('H:i'),
         'cust_name'      => 'Walk-in Customer',
@@ -180,15 +184,16 @@
                 foreach ($cart as $item): ?>
                 <div class="d-flex justify-content-between text-muted-2 mb-2">
                     <span><?= htmlspecialchars($item['name']) ?> x<?= (int)$item['qty'] ?></span>
-                    <span>KSh. <?= number_format($item['price']*$item['qty'], 2) ?></span>
+                    <span>KSh. <?= number_format($item['price']*$item['qty'] * 0.84, 2) ?></span>
                 </div>
             <?php endforeach; ?>
             <div class="divider-line"></div>
-            <div class="d-flex justify-content-between text-muted-2 mb-2"><span>Sub Total</span><span>KSh. <?= number_format($sub, 2) ?></span></div>
+            <div class="d-flex justify-content-between text-muted-2 mb-2"><span>Sub Total</span><span>KSh. <?= number_format($sub * 0.84, 2) ?></span></div>
             <div class="d-flex justify-content-between text-muted-2 mb-2"><span>Dining</span><span><?= $dining === 'eat_in' ? 'Eat-in' : ('Take Away · ' . ($rider === 'own' ? 'I have a rider' : 'Send your rider')) ?></span></div>
-            <div class="d-flex justify-content-between text-muted-2 mb-2"><span>Delivery Cost</span><span>KSh. <?= number_format($delivery, 2) ?></span></div>
+            <div class="d-flex justify-content-between text-muted-2 mb-2"><span>Delivery Cost</span><span>KSh. <?= number_format($delivery * 0.84, 2) ?></span></div>
+            <div class="d-flex justify-content-between text-muted-2 mb-2"><span>Tax (16%)</span><span>KSh. <?= number_format($total * 0.16, 2) ?></span></div>
             <div class="d-flex justify-content-between fw-bold"><span>Total</span><span class="text-primary-2">KSh. <?= number_format($total, 2) ?></span></div>
-            <input type="hidden" name="amount" value="<?= number_format($total, 0) ?>">
+            <input type="hidden" name="amount" value="<?= number_format($total * 0.84, 0) ?>">
         </div>
 
         <div class="glass-card p-3 mb-3">
@@ -219,11 +224,13 @@
                 <img class="logo-img" src="<?= e($watermark_data_uri) ?>" alt="The Black Perch">
             <?php endif; ?>
             <div class="center bold">THE BLACK PERCH</div>
-            <div class="center">Order Receipt</div>
+            <div class="center">Website: https://www.theblackperch.com</div>
+            <div class="center">Mobile: 0117619325</div>
+            <div class="center">Customer Order Receipt</div>
 
             <div class="dashed"></div>
 
-            <div><b>Receipt No:</b> <?= e($data['receipt_no']) ?></div>
+            <div><b>Bill No:</b> <?= e($data['receipt_no']) ?></div>
             <div><b>Date:</b> <?= e($data['date']) ?> &nbsp;<?= e($data['time']) ?></div>
             <div><b>Customer:</b> <?= e($data['cust_name']) ?></div>
             <?php if ($data['served_by'] !== ''): ?>
@@ -244,16 +251,17 @@
                 <tr>
                     <td><?= e($item['name']) ?></td>
                     <td class="num"><?= (int)$item['qty'] ?></td>
-                    <td class="num"><?= number_format($item['price'], 0) ?></td>
-                    <td class="num"><?= number_format($item['qty'] * $item['price'], 0) ?></td>
+                    <td class="num"><?= number_format($item['price'] * 0.84, 0) ?></td>
+                    <td class="num"><?= number_format($item['qty'] * $item['price'] * 0.84, 0) ?></td>
                 </tr>
                 <?php endforeach; ?>
             </table>
 
             <div class="dashed"></div>
 
-            <div style="display:flex; justify-content:space-between;"><span>Sub Total</span><span><?= number_format($sub, 2) ?></span></div>
-            <div style="display:flex; justify-content:space-between;"><span>Delivery Cost</span><span><?= number_format($delivery, 2) ?></span></div>
+            <div style="display:flex; justify-content:space-between;"><span>Sub Total</span><span><?= number_format($sub * 0.84, 2) ?></span></div>
+            <div style="display:flex; justify-content:space-between;"><span>Delivery Cost</span><span><?= number_format($delivery * 0.84, 2) ?></span></div>
+            <div style="display:flex; justify-content:space-between;"><span>Tax (16%)</span><span><?= number_format($total * 0.16, 2) ?></span></div>
             <div style="display:flex; justify-content:space-between;" class="bold"><span>Total</span><span><?= number_format($total, 2) ?></span></div>
 
             <div class="dashed"></div>
@@ -265,7 +273,7 @@
             <div class="dashed"></div>
 
             <div id="qrcode-container" style="margin:10px auto 4px; width:100px; height:100px;"></div>
-            <div class="center" style="font-size:9.5px; color:#666;">Scan to view your order</div>
+            <div class="center" style="font-size:9.5px; color:#666;">Scan to view Delivery Location</div>
 
             <div class="dashed"></div>
             <div class="center" style="color:#666;">Thank you for ordering with The Black Perch</div>

@@ -156,8 +156,24 @@
             return $phone;
         }
         $phone_number = normalizePhoneNumber($phone_number);
-        //$amount = $_POST['amount'];
-        $amount = '1';
+
+        //COST CALCULATION + DELIVERY COST + TAX
+        $deliveryCost = $_SESSION['delivery_address']['delivery_cost'] ?? null;
+        $sub = cart_total();
+        $amount = $sub + (number_format($deliveryCost,0) ?? 0);
+        $order_type = $_SESSION['dining'];
+        $sub_total = $sub * 0.84;
+        $delivery_subtotal = ($deliveryCost ?? 0) * 0.84;
+        $tax = $amount * 0.16;
+
+        //GET DATE AND TIME FOR ORDER NUMBER TO SET AS ORDER NUMBER
+        $dateObj = DateTime::createFromFormat('U.u', microtime(TRUE));
+        $dateObj->setTimeZone(new DateTimeZone('Africa/Nairobi'));
+        $date = $dateObj->format('YmdHisu');
+
+        //ORDER NUMBER IS SET AS DATE AND TIME IN YMDHISU FORMAT
+        $order_number = $date;
+        //$amount = '1';
 
         // Get access token
         $access_token = getAccessToken($consumer_key, $consumer_secret);

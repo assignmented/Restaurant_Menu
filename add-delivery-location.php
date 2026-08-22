@@ -17,6 +17,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['address'])) {
                                 ? (int) $_POST['distance_meters'] : null,
         'distance_text'   => isset($_POST['distance_text']) && $_POST['distance_text'] !== ''
                                 ? trim((string) $_POST['distance_text']) : null,
+        'delivery_cost'   => isset($_POST['distance_meters']) && $_POST['distance_meters'] !== ''
+                                ? (int) $_POST['distance_meters'] * 0.06 : null,
     ];
     header('Content-Type: application/json');
     echo json_encode(['ok' => true]);

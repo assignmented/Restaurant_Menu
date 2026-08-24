@@ -61,6 +61,11 @@
                     logMessage("No matching payment row for CheckoutRequestID: $checkout_request_id (0 rows affected)");
                 } else {
                     logMessage("Payment status updated in database: $checkout_request_id - $status");
+                    $order_status = 'Pending';
+                    $sql_order = "UPDATE orders SET order_status = ? WHERE order_number = (SELECT pay_orderid FROM payments WHERE pay_checkout_req_id = ?)";
+                    $stmt_order = $conx->prepare($sql_order); 
+                    $stmt_order->bind_param("ss", $order_status, $checkout_request_id);
+                    $stmt_order->execute();
                 }
             } else {
                 logMessage("Error updating payment status: " . $stmt->error);

@@ -2,6 +2,7 @@
     //mpesa_stkpush.php
     // Database connection 
     require_once __DIR__ . '/../config.php';
+    $cart = cart(); //Fetch order items from the cart
     
     if ($conx->connect_error) {
         log_payment_error('DB connection failed: ' . $conx->connect_error);
@@ -173,7 +174,44 @@
 
         //ORDER NUMBER IS SET AS DATE AND TIME IN YMDHISU FORMAT
         $order_number = $date;
+        $order_customertype = 'Online';
+        $order_status = 'Unpaid';
         //$amount = '1';
+
+        // ADD TO ORDERS TABLE
+        $sql = "INSERT INTO orders (order_number, order_customertype, order_type, order_subtotalamt, order_deliveryamt, order_taxamt, order_totalamt, order_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        $stmt = $conx->prepare($sql);
+        $stmt->bind_param("ssssdddd", $order_number, $order_customertype, $order_type, $sub_total, $delivery_subtotal, $tax, $amount, $order_status);
+
+        if ($stmt->execute()) {
+            $order_id = $stmt->insert_id;
+        }else {
+            log_payment_error('DB insert failed for order record', [
+                'mysqli_error' => $stmt->error,
+                'order_number' => $order_number,
+            ]);
+            echo json_encode(['success' => false, 'message' => 'Error saving order details.']);
+            $conx->close();
+            exit;
+        }
+
+        // ADD TO ORDER ITEMS TABLE
+        foreach ($cart as $item) {
+            $sql = "INSERT INTO order_items (order_item_orderid, order_item_itemid, order_item_quantity, order_item_unitprice,order_item_subtotalprice) VALUES (?, ?, ?, ?, ?)";
+            $stmt = $conx->prepare($sql);
+            $stmt->bind_param("iisdi", $order_id, $item['id'], $item['quantity'], $item['price'], $item['price'] * $item['quantity']);
+
+            if (!$stmt->execute()) {
+                log_payment_error('DB insert failed for order_items record', [
+                    'mysqli_error' => $stmt->error,
+                    'order_id' => $order_id,
+                    'item_id' => $item['id'],
+                ]);
+                echo json_encode(['success' => false, 'message' => 'Error saving order item details.']);
+                $conx->close();
+                exit;
+            }
+        }
 
         // Get access token
         $access_token = getAccessToken($consumer_key, $consumer_secret);
@@ -190,20 +228,23 @@
         if ($stk_push_response !== null && isset($stk_push_response->ResponseCode) && $stk_push_response->ResponseCode == "0") {
             // Payment request successful, save to database
             $checkout_request_id = $stk_push_response->CheckoutRequestID;
-            $sql = "INSERT INTO payments (pay_phone_number, pay_amount, pay_checkout_req_id, pay_status) VALUES (?, ?, ?, 'PENDING')";
+            $merchant_request_id = $stk_push_response->MerchantRequestID;
+            $sql = "INSERT INTO payments (pay_orderid, pay_phone_number, pay_amount, pay_checkout_req_id, pay_merchant_req_id, pay_status, pay_method) VALUES (?, ?, ?, ?, ?, 'PENDING', 'M-PESA')";
             $stmt = $conx->prepare($sql);
-            $stmt->bind_param("sds", $phone_number, $amount, $checkout_request_id);
+            $stmt->bind_param("ssds", $order_id, $phone_number, $amount, $checkout_request_id, $merchant_request_id);
 
             if ($stmt->execute()) {
                 echo json_encode([
                     'success' => true,
                     'message' => 'Payment request sent. Please check your phone to complete the transaction.',
-                    'checkout_request_id' => $checkout_request_id
+                    'checkout_request_id' => $checkout_request_id,
+                    'merchant_request_id' => $merchant_request_id
                 ]);
             } else {
                 log_payment_error('DB insert failed for payment record', [
                     'mysqli_error' => $stmt->error,
                     'checkout_request_id' => $checkout_request_id,
+                    'merchant_request_id' => $merchant_request_id
                 ]);
                 echo json_encode(['success' => false, 'message' => 'Error saving payment details.']);
             }

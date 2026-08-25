@@ -161,7 +161,8 @@
         //COST CALCULATION + DELIVERY COST + TAX
         $deliveryCost = $_SESSION['delivery_address']['delivery_cost'] ?? null;
         $sub = cart_total();
-        $amount = $sub + (number_format($deliveryCost,0) ?? 0);
+        //$amount = $sub + (number_format($deliveryCost,0) ?? 0);
+        $amount = '1';
         $order_type = $_SESSION['dining'];
         $sub_total = $sub * 0.84;
         $delivery_subtotal = ($deliveryCost ?? 0) * 0.84;
@@ -195,24 +196,6 @@
             exit;
         }
 
-        // ADD TO ORDER ITEMS TABLE
-        foreach ($cart as $item) {
-            $sql = "INSERT INTO order_items (order_item_orderid, order_item_itemid, order_item_quantity, order_item_unitprice,order_item_subtotalprice) VALUES (?, ?, ?, ?, ?)";
-            $stmt = $conx->prepare($sql);
-            $stmt->bind_param("iisdi", $order_id, $item['id'], $item['quantity'], $item['price'], $item['price'] * $item['quantity']);
-
-            if (!$stmt->execute()) {
-                log_payment_error('DB insert failed for order_items record', [
-                    'mysqli_error' => $stmt->error,
-                    'order_id' => $order_id,
-                    'item_id' => $item['id'],
-                ]);
-                echo json_encode(['success' => false, 'message' => 'Error saving order item details.']);
-                $conx->close();
-                exit;
-            }
-        }
-
         // Get access token
         $access_token = getAccessToken($consumer_key, $consumer_secret);
 
@@ -231,7 +214,7 @@
             $merchant_request_id = $stk_push_response->MerchantRequestID;
             $sql = "INSERT INTO payments (pay_orderid, pay_phone_number, pay_amount, pay_checkout_req_id, pay_merchant_req_id, pay_status, pay_method) VALUES (?, ?, ?, ?, ?, 'PENDING', 'M-PESA')";
             $stmt = $conx->prepare($sql);
-            $stmt->bind_param("ssds", $order_id, $phone_number, $amount, $checkout_request_id, $merchant_request_id);
+            $stmt->bind_param("ssdss", $order_id, $phone_number, $amount, $checkout_request_id, $merchant_request_id);
 
             if ($stmt->execute()) {
                 echo json_encode([
@@ -247,6 +230,22 @@
                     'merchant_request_id' => $merchant_request_id
                 ]);
                 echo json_encode(['success' => false, 'message' => 'Error saving payment details.']);
+            }
+
+            foreach ($cart as $item) {
+                $sql = "INSERT INTO order_items (order_item_orderid, order_item_itemid, order_item_quantity, order_item_unitprice,order_item_subtotalprice) VALUES (?, ?, ?, ?, ?)";
+                $stmt = $conx->prepare($sql);
+                $subtotal = round($item['price'] * $item['qty'], 2);
+                $stmt->bind_param("iiidd", $order_id, $item['id'], $item['qty'], $item['price'], $subtotal);
+
+                if (!$stmt->execute()) {
+                    log_payment_error('DB insert failed for order_items record', [
+                        'mysqli_error' => $stmt->error,
+                        'order_id' => $order_id,
+                        'item_id' => $item['id'],
+                    ]);
+                    // Response already sent — log only, don't echo/exit here.
+                }
             }
         } else {
             // Note: initiateSTKPush() already logged the raw failure reason above.

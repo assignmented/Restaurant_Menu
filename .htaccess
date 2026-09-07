@@ -1,0 +1,74 @@
+# ============================================================
+# Prevent Directory Listing
+# ============================================================
+Options -Indexes
+
+# ============================================================
+# Security Headers - XSS Protection
+# ============================================================
+
+# Enable the browser's built-in XSS filter (legacy header, still useful)
+<IfModule mod_headers.c>
+    Header set X-XSS-Protection "1; mode=block"
+
+    # Prevent content from being sniffed to a different MIME type
+    Header set X-Content-Type-Options "nosniff"
+
+    # Control which origins can embed this site (clickjacking protection)
+    Header set X-Frame-Options "SAMEORIGIN"
+
+    # Strict-Transport-Security (uncomment if using HTTPS)
+    # Header set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+    # Referrer-Policy - limit referrer info sent to other sites
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+
+    # Permissions-Policy - restrict powerful browser features
+    Header set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+
+    # Content-Security-Policy - restrict sources of content
+    # Helps prevent XSS by defining approved sources for scripts, styles, etc.
+    Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self';"
+</IfModule>
+
+# ============================================================
+# Block common XSS attack patterns in query strings
+# ============================================================
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Block requests with <script> tags in the query string
+    RewriteCond %{QUERY_STRING} (<|%3C).*script.*(>|%3E) [NC,OR]
+
+    # Block requests with javascript: URI in the query string
+    RewriteCond %{QUERY_STRING} javascript: [NC,OR]
+
+    # Block requests with onmouseover/onload/etc. event handlers in query string
+    RewriteCond %{QUERY_STRING} on(mouseover|load|error|click|focus|blur|submit|change|key) [NC,OR]
+
+    # Block requests with data: URI in the query string
+    RewriteCond %{QUERY_STRING} data: [NC,OR]
+
+    # Block requests with document.cookie in the query string
+    RewriteCond %{QUERY_STRING} document\.cookie [NC,OR]
+
+    # Block requests with eval() or expression() in the query string
+    RewriteCond %{QUERY_STRING} (eval|expression)\( [NC]
+
+    # Return 403 Forbidden for matched requests
+    RewriteRule ^.*$ - [F,L]
+</IfModule>
+
+# ============================================================
+# Prevent access to sensitive file types
+# ============================================================
+<FilesMatch "\.(htaccess|htpasswd|ini|phps|fla|psd|log|sh|sql|bak|config|env|git|svn)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# ============================================================
+# Disable server signature (version info in error pages)
+# ============================================================
+ServerSignature Off
+ServerTokens Prod

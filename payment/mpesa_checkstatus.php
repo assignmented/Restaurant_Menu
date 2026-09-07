@@ -14,7 +14,7 @@
     if (isset($_GET['checkout_request_id'])) {
         $checkout_request_id = $_GET['checkout_request_id'];
         
-        $sql = "SELECT pay_status, pay_mpesa_receipt, pay_amount FROM payments WHERE pay_checkout_req_id = ?";
+        $sql = "SELECT pay_status, pay_mpesa_receipt, pay_amount, pay_orderid FROM payments WHERE pay_checkout_req_id = ?";
         $stmt = $conx->prepare($sql);
         $stmt->bind_param("s", $checkout_request_id);
         $stmt->execute();
@@ -22,6 +22,35 @@
         
         if ($row = $result->fetch_assoc()) {
             if ($row['pay_status'] == 'COMPLETED') {
+                // Safaricom confirmed — finalize the payment as Paid.
+                $sql = "UPDATE payments SET pay_status = 'Paid' WHERE pay_checkout_req_id = ?";
+                $stmt = $conx->prepare($sql);
+                $stmt->bind_param("s", $checkout_request_id);
+                if (!$stmt->execute()) {
+                    error_log('mpesa_checkstatus: failed to set pay_status=Paid for ' . $checkout_request_id . ': ' . $stmt->error);
+                }
+
+                $order_id = (int) $row['pay_orderid'];
+
+                $sql = "UPDATE orders SET order_status = 'Pending' WHERE order_id = ?";
+                $stmt = $conx->prepare($sql);
+                $stmt->bind_param("i", $order_id);
+                if (!$stmt->execute()) {
+                    error_log('mpesa_checkstatus: failed to set order_status=Pending for ' . $order_id . ': ' . $stmt->error);
+                }
+
+                // Order is live — create a kitchen ticket so prep can begin.
+                // pay_orderid came from the SELECT above; only kitchen_orderid
+                // is required here — station/status/timestamps default on the
+                // table ('Main Kitchen', 'New', now()).
+                $sql = "INSERT INTO kitchen_tickets (kitchen_orderid) VALUES (?)";
+                $stmt = $conx->prepare($sql);
+                $stmt->bind_param("i", $order_id);
+                if (!$stmt->execute()) {
+                    error_log('mpesa_checkstatus: failed to insert kitchen ticket for order ' . $order_id . ': ' . $stmt->error);
+                    // Payment already succeeded — log only, don't fail the response.
+                }
+                
                 echo json_encode([
                     'success' => true,
                     'status' => 'COMPLETED',

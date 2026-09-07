@@ -38,7 +38,7 @@ include __DIR__ . '/includes/header.php';
             while($items_result = $items_query->fetch_assoc()): ?>
             <div class="col">
                 <a href="product.php?id=<?= $items_result['item_id'] ?>" class="food-row">
-                    <img src="assets/img/img/menu/<?= $items_result['item_image'] ?>" class="thumb" alt="<?= htmlspecialchars($items_result['item_name']) ?>" loading="lazy">
+                    <img src="https://pos.theblackperch.co.ke/assets/img/menu/<?= $items_result['item_image'] ?>" class="thumb" alt="<?= htmlspecialchars($items_result['item_name']) ?>" loading="lazy">
                     <div class="flex-grow-1">
                         <div class="fw-semibold"><?= htmlspecialchars($items_result['item_name']) ?></div>
                         <div class="mt-1">

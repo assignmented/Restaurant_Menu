@@ -262,7 +262,7 @@ function find_item($id) {
         'id'     => (int) $r['item_id'],
         'name'   => $r['item_name'],
         'img'    => $r['item_image'] !== ''
-            ? 'assets/img/img/menu/' . $r['item_image']
+            ? 'https://pos.theblackperch.co.ke/assets/img/menu/' . $r['item_image']
             : 'assets/img/black_perch.png',
         'price'  => (float) str_replace(',', '', $r['item_price']),
         'rating' => (float) $r['item_rating'],

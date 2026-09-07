@@ -8,21 +8,52 @@
     // take-away + "I have a rider" = no fee; take-away + "Send your rider" = fee.
     // No discount on either selection.
     $dining = $_GET['dining'] ?? ($_SESSION['dining'] ?? 'takeaway');
+
+    $rider = $_GET['rider'] ?? ($_SESSION['rider'] ?? 'send');
+
+    // Delivery address to show: the map-picked address for "Send your rider"
+    // orders, otherwise the user's saved address. Road distance (if it was
+    // calculated when the pin was confirmed) is shown alongside it.
+    $deliveryAddr = $user['user_address'] ?? '';
+    $changeAddrHref = 'change-address.php';
+    $distanceText = null;
+    $distanceMeters = null;
+    $deliveryCost = null;
+    if ($dining === 'takeaway' && $rider === 'send' && !empty($_SESSION['delivery_address']['address'])) {
+        $deliveryAddr = $_SESSION['delivery_address']['address'];
+        $changeAddrHref = 'add-delivery-location.php?dining=takeaway&rider=send';
+        $distanceText = $_SESSION['delivery_address']['distance_text'] ?? null;
+        $distanceMeters = $_SESSION['delivery_address']['distance_meters'] ?? null;
+        $deliveryCost = $_SESSION['delivery_address']['delivery_cost'] ?? null;
+    }
+
+    // Honor the dining + rider choices made on cart.php (session, with a
+    // query-string override from the Checkout link). Eat-in = no delivery fee;
+    // take-away + "I have a rider" = no fee; take-away + "Send your rider" = fee.
+    // No discount on either selection.
+    
     if (!in_array($dining, ['eat_in', 'takeaway'], true)) {
         $dining = 'takeaway';
     }
     $_SESSION['dining'] = $dining;
 
-    $rider = $_GET['rider'] ?? ($_SESSION['rider'] ?? 'send');
     if (!in_array($rider, ['own', 'send'], true)) {
         $rider = 'send';
     }
     $_SESSION['rider'] = $rider;
 
+    $distanceMeters = $distanceMeters ?? 0;
+    $distance = round($distanceMeters / 1000, 1);
+    if ($distance >= 1) {
+        $distanceCost = $distance * 60;
+    } else {
+        $distanceCost = 60;
+    }
+
     if ($dining === 'eat_in') {
         $delivery = 0.00;
     } else {
-        $delivery = ($rider === 'own') ? 0.00 : 250;
+        $delivery = ($rider === 'own') ? 0.00 : $distanceCost;
     }
     $sub = cart_total();
     $total = $sub + $delivery;
@@ -184,16 +215,17 @@
                 foreach ($cart as $item): ?>
                 <div class="d-flex justify-content-between text-muted-2 mb-2">
                     <span><?= htmlspecialchars($item['name']) ?> x<?= (int)$item['qty'] ?></span>
-                    <span>KSh. <?= number_format($item['price']*$item['qty'] * 0.84, 2) ?></span>
+                    <span>KSh. <?= number_format($item['price']*$item['qty'] * 0.82, 2) ?></span>
                 </div>
             <?php endforeach; ?>
             <div class="divider-line"></div>
-            <div class="d-flex justify-content-between text-muted-2 mb-2"><span>Sub Total</span><span>KSh. <?= number_format($sub * 0.84, 2) ?></span></div>
+            <div class="d-flex justify-content-between text-muted-2 mb-2"><span>Sub Total</span><span>KSh. <?= number_format($sub * 0.82, 2) ?></span></div>
             <div class="d-flex justify-content-between text-muted-2 mb-2"><span>Dining</span><span><?= $dining === 'eat_in' ? 'Eat-in' : ('Take Away · ' . ($rider === 'own' ? 'I have a rider' : 'Send your rider')) ?></span></div>
-            <div class="d-flex justify-content-between text-muted-2 mb-2"><span>Delivery Cost</span><span>KSh. <?= number_format($delivery * 0.84, 2) ?></span></div>
+            <div class="d-flex justify-content-between text-muted-2 mb-2"><span>Delivery Cost</span><span>KSh. <?= number_format($delivery * 0.82, 2) ?></span></div>
+            <div class="d-flex justify-content-between text-muted-2 mb-2"><span>Catering Levy (2%)</span><span>KSh. <?= number_format($total * 0.02, 2) ?></span></div>
             <div class="d-flex justify-content-between text-muted-2 mb-2"><span>Tax (16%)</span><span>KSh. <?= number_format($total * 0.16, 2) ?></span></div>
             <div class="d-flex justify-content-between fw-bold"><span>Total</span><span class="text-primary-2">KSh. <?= number_format($total, 2) ?></span></div>
-            <input type="hidden" name="amount" value="<?= number_format($total * 0.84, 0) ?>">
+            <input type="hidden" name="amount" value="<?= number_format($total * 0.82, 0) ?>">
         </div>
 
         <div class="glass-card p-3 mb-3">
@@ -251,16 +283,17 @@
                 <tr>
                     <td><?= e($item['name']) ?></td>
                     <td class="num"><?= (int)$item['qty'] ?></td>
-                    <td class="num"><?= number_format($item['price'] * 0.84, 0) ?></td>
-                    <td class="num"><?= number_format($item['qty'] * $item['price'] * 0.84, 0) ?></td>
+                    <td class="num"><?= number_format($item['price'] * 0.82, 0) ?></td>
+                    <td class="num"><?= number_format($item['qty'] * $item['price'] * 0.82, 0) ?></td>
                 </tr>
                 <?php endforeach; ?>
             </table>
 
             <div class="dashed"></div>
 
-            <div style="display:flex; justify-content:space-between;"><span>Sub Total</span><span><?= number_format($sub * 0.84, 2) ?></span></div>
-            <div style="display:flex; justify-content:space-between;"><span>Delivery Cost</span><span><?= number_format($delivery * 0.84, 2) ?></span></div>
+            <div style="display:flex; justify-content:space-between;"><span>Sub Total</span><span><?= number_format($sub * 0.82, 2) ?></span></div>
+            <div style="display:flex; justify-content:space-between;"><span>Delivery Cost</span><span><?= number_format($delivery * 0.82, 2) ?></span></div>
+            <div style="display:flex; justify-content:space-between;"><span>Catering Levy (2%)</span><span><?= number_format($total * 0.02, 2) ?></span></div>
             <div style="display:flex; justify-content:space-between;"><span>Tax (16%)</span><span><?= number_format($total * 0.16, 2) ?></span></div>
             <div style="display:flex; justify-content:space-between;" class="bold"><span>Total</span><span><?= number_format($total, 2) ?></span></div>
 

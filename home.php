@@ -74,7 +74,7 @@ include __DIR__ . '/includes/header.php';
         ?>
             <div class="col">
                 <a href="product.php?id=<?= $items_result['item_id'] ?>" class="rest-card d-block">
-                    <img src="assets/img/img/menu/<?= $items_result['item_image'] ?>" class="thumb" alt="<?= htmlspecialchars($items_result['item_name']) ?>" loading="lazy">
+                    <img src="https://pos.theblackperch.co.ke/assets/img/menu/<?= $items_result['item_image'] ?>" class="thumb" alt="<?= htmlspecialchars($items_result['item_name']) ?>" loading="lazy">
                     <div class="body">
                         <div class="d-flex justify-content-between align-items-center">
                             <h6 class="mb-0 fw-bold"><?= htmlspecialchars($items_result['item_name']) ?></h6>

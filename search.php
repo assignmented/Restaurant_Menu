@@ -44,7 +44,7 @@ $res = $stmt->get_result();
 $out = [];
 while ($r = $res->fetch_assoc()) {
     $img = $r['item_image'] !== ''
-        ? 'assets/img/img/menu/' . $r['item_image']
+        ? 'https://pos.theblackperch.co.ke/assets/img/menu/' . $r['item_image']
         : 'assets/img/black_perch.png'; // placeholder for image-less items
     $out[] = [
         'id'     => (int) $r['item_id'],

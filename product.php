@@ -77,8 +77,9 @@
                 <small>Total Price</small>
                 <b id="stepperTotal">KSh. <?= number_format($p['price'], 2) ?></b>
             </div>
-            <button type="submit" class="btn-primary-2" style="width:auto; padding-left:2rem; padding-right:2rem;">Add to Cart</button>
         </div>
+            <button type="submit" class="btn-primary-2" style="width:auto; padding-left:2rem; padding-right:2rem;">Add to Cart</button>
+        
     </form>
 </div>
 

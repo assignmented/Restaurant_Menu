@@ -3,29 +3,10 @@
         require_once __DIR__ . '/config.php';
         $user = current_user();
         $cart = cart();
-        // Honor the dining + rider choices made on cart.php (session, with a
-        // query-string override from the Checkout link). Eat-in = no delivery fee;
-        // take-away + "I have a rider" = no fee; take-away + "Send your rider" = fee.
-        // No discount on either selection.
+
         $dining = $_GET['dining'] ?? ($_SESSION['dining'] ?? 'takeaway');
-        if (!in_array($dining, ['eat_in', 'takeaway'], true)) {
-            $dining = 'takeaway';
-        }
-        $_SESSION['dining'] = $dining;
 
         $rider = $_GET['rider'] ?? ($_SESSION['rider'] ?? 'send');
-        if (!in_array($rider, ['own', 'send'], true)) {
-            $rider = 'send';
-        }
-        $_SESSION['rider'] = $rider;
-
-        if ($dining === 'eat_in') {
-            $delivery = 0.00;
-        } else {
-            $delivery = ($rider === 'own') ? 0.00 : 250.00;
-        }
-        $sub = cart_total();
-        $total = $sub + $delivery;
 
         // Delivery address to show: the map-picked address for "Send your rider"
         // orders, otherwise the user's saved address. Road distance (if it was
@@ -42,6 +23,37 @@
             $distanceMeters = $_SESSION['delivery_address']['distance_meters'] ?? null;
             $deliveryCost = $_SESSION['delivery_address']['delivery_cost'] ?? null;
         }
+
+        // Honor the dining + rider choices made on cart.php (session, with a
+        // query-string override from the Checkout link). Eat-in = no delivery fee;
+        // take-away + "I have a rider" = no fee; take-away + "Send your rider" = fee.
+        // No discount on either selection.
+        
+        if (!in_array($dining, ['eat_in', 'takeaway'], true)) {
+            $dining = 'takeaway';
+        }
+        $_SESSION['dining'] = $dining;
+
+        if (!in_array($rider, ['own', 'send'], true)) {
+            $rider = 'send';
+        }
+        $_SESSION['rider'] = $rider;
+
+        $distanceMeters = $distanceMeters ?? 0;
+        $distance = round($distanceMeters / 1000, 1);
+        if ($distance >= 1) {
+            $distanceCost = $distance * 60;
+        } else {
+            $distanceCost = 60;
+        }
+
+        if ($dining === 'eat_in') {
+            $delivery = 0.00;
+        } else {
+            $delivery = ($rider === 'own') ? 0.00 : $distanceCost;
+        }
+        $sub = cart_total();
+        $total = $sub + $delivery;
 
         $active = 'cart';
         $pageTitle = 'Checkout';
@@ -122,11 +134,11 @@
             <p class="text-muted-2 mb-0"><?= htmlspecialchars($deliveryAddr) ?></p>
             <?php if (!empty($distanceText)): ?>
                 <div class="delivery-distance-badge">
-                    <i class="fa-solid fa-route"></i> <?= htmlspecialchars($distanceText) ?> by road
+                    <i class="fa-solid fa-route"></i> <?= htmlspecialchars($distance) ?> Km by road
                 </div>
             <?php elseif ($distanceMeters !== null): ?>
                 <div class="delivery-distance-badge">
-                    <i class="fa-solid fa-route"></i> <?= number_format($distanceMeters / 1000, 1) ?> km by road
+                    <i class="fa-solid fa-route"></i> <?= number_format($distance, 1) ?> Km by road
                 </div>
             <?php endif; ?>
         </div>
@@ -189,7 +201,7 @@
                 <div class="divider-line"></div>
                 <div class="d-flex justify-content-between text-muted-2 mb-2"><span>Sub Total</span><span>KSh. <?= number_format($sub, 2) ?></span></div>
                 <div class="d-flex justify-content-between text-muted-2 mb-2"><span>Dining</span><span><?= $dining === 'eat_in' ? 'Eat-in' : ('Take Away · ' . ($rider === 'own' ? 'I have a rider' : 'Send your rider')) ?></span></div>
-                <div class="d-flex justify-content-between text-muted-2 mb-2"><span>Delivery Cost</span><span>KSh. <?= number_format($distanceMeters / 1000, 1) * 60?></span></div>
+                <div class="d-flex justify-content-between text-muted-2 mb-2"><span>Delivery Cost</span><span>KSh. <?= number_format($distanceCost, 1)?></span></div>
                 <div class="d-flex justify-content-between fw-bold"><span>Total</span><span class="text-primary-2">KSh. <?= number_format($total, 0) ?></span></div>
                 <input type="hidden" name="amount" value="<?= number_format($total, 0) ?>">
             </div>

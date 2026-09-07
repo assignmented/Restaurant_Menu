@@ -29,7 +29,7 @@ $_SESSION['rider'] = $rider;
 if ($dining === 'eat_in') {
     $delivery = 0.00;
 } else {
-    $delivery = ($rider === 'own') ? 0.00 : 50.00;
+    $delivery = ($rider === 'own') ? 0.00 : 60.00;
 }
 $sub = cart_total();
 $total = $sub + $delivery;
@@ -101,7 +101,7 @@ include __DIR__ . '/includes/header.php';
         <input type="text" class="form-control-2 mb-3" placeholder="e.g. leave at the door">
         <div class="d-flex justify-content-between text-muted-2 mb-2"><span>Sub Total</span><span id="sumSub">KSh. <?= number_format($sub, 2) ?></span></div>
         <div class="d-flex justify-content-between text-muted-2 mb-2">
-            <span>Delivery Cost ( KSh. 50/Km )</span>
+            <span>Delivery Cost ( KSh. 60/Km )</span>
             <span id="sumDelivery">KSh. <?= number_format($delivery, 2) ?></span>
         </div>
         <div class="divider-line"></div>

@@ -164,25 +164,25 @@
         //$amount = $sub + (number_format($deliveryCost,0) ?? 0);
         $amount = '1';
         $order_type = $_SESSION['dining'];
-        $sub_total = $sub * 0.84;
-        $delivery_subtotal = ($deliveryCost ?? 0) * 0.84;
-        $tax = $amount * 0.16;
+        $sub_total = $sub * 0.82;
+        $delivery_subtotal = ($deliveryCost ?? 0) * 0.82;
+        $tax = $amount * 0.18;
 
         //GET DATE AND TIME FOR ORDER NUMBER TO SET AS ORDER NUMBER
         $dateObj = DateTime::createFromFormat('U.u', microtime(TRUE));
         $dateObj->setTimeZone(new DateTimeZone('Africa/Nairobi'));
-        $date = $dateObj->format('YmdHisu');
+        $date = $dateObj->format('YmdHis');
 
         //ORDER NUMBER IS SET AS DATE AND TIME IN YMDHISU FORMAT
-        $order_number = $date;
+        $order_number = 'TBP-' . $date;
         $order_customertype = 'Online';
         $order_status = 'Unpaid';
         //$amount = '1';
 
         // ADD TO ORDERS TABLE
-        $sql = "INSERT INTO orders (order_number, order_customertype, order_type, order_subtotalamt, order_deliveryamt, order_taxamt, order_totalamt, order_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO orders (order_number, order_customertype, order_type, order_subtotalamt, order_deliveryamt, order_taxamt, order_totalamt, order_status, order_lat, order_lng) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $conx->prepare($sql);
-        $stmt->bind_param("ssssdddd", $order_number, $order_customertype, $order_type, $sub_total, $delivery_subtotal, $tax, $amount, $order_status);
+        $stmt->bind_param("ssssddddss", $order_number, $order_customertype, $order_type, $sub_total, $delivery_subtotal, $tax, $amount, $order_status, $_SESSION['delivery_address']['lat'], $_SESSION['delivery_address']['lng']);
 
         if ($stmt->execute()) {
             $order_id = $stmt->insert_id;
@@ -212,7 +212,7 @@
             // Payment request successful, save to database
             $checkout_request_id = $stk_push_response->CheckoutRequestID;
             $merchant_request_id = $stk_push_response->MerchantRequestID;
-            $sql = "INSERT INTO payments (pay_orderid, pay_phone_number, pay_amount, pay_checkout_req_id, pay_merchant_req_id, pay_status, pay_method) VALUES (?, ?, ?, ?, ?, 'PENDING', 'M-PESA')";
+            $sql = "INSERT INTO payments (pay_orderid, pay_phone_number, pay_amount, pay_checkout_req_id, pay_merchant_req_id, pay_status, pay_method) VALUES (?, ?, ?, ?, ?, 'Pending', 'M-PESA')";
             $stmt = $conx->prepare($sql);
             $stmt->bind_param("ssdss", $order_id, $phone_number, $amount, $checkout_request_id, $merchant_request_id);
 
